@@ -27,7 +27,7 @@ class Affiliate_Links_CSV_Admin {
         <h1><?php _e('Import/Export Affiliate Links', 'affiliate-links-csv'); ?></h1>
         <div class="wrap">
 			<?php settings_errors();
-			(new Affiliate_Links_CSV_Importer())->affiliate_links_process_csv_import();
+			(new Affiliate_Links_CSV_Importer())->csv_import();
 			(new Affiliate_Links_CSV_Exporter())->display_export_form();
 			?>
         </div>

@@ -1,9 +1,3 @@
-<!--<form action="" method="post" enctype="multipart/form-data">-->
-<!--	--><?php //wp_nonce_field('affil_links_export_nonce'); ?>
-<!--	<h2>--><?php //_e('Export affiliate links to a CSV file', 'affiliate-links-csv'); ?><!--</h2>-->
-<!--	<input type="submit" name="export_csv" value="--><?php //_e('Export CSV-file', 'affiliate-links-csv'); ?><!--"-->
-<!--           class="button button-primary">-->
-<!--</form>-->
 <?php
 $export_url = admin_url('edit.php?post_type=affiliate-links&page=affiliate-links-csv&action=export_csv&_wpnonce=' . wp_create_nonce('affil_links_export_nonce'));
 ?>
