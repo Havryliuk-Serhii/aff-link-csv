@@ -9,6 +9,7 @@ class Affiliate_Links_CSV_Importer {
 		require_once AFFILIATE_LINKS_CSV_PLUGIN_DIR . '/admin/partials/csv-import-form.php';
 	}
 	public function csv_import() {
+
 		if ( isset( $_POST['import_submit'] ) && ! empty( $_FILES['import_csv']['tmp_name'] ) ) {
 			// Verify nonce for security.
 			check_admin_referer( 'affiliate_links_csv_import_nonce_action', 'affiliate_links_csv_import_nonce' );
@@ -21,14 +22,14 @@ class Affiliate_Links_CSV_Importer {
 			$imported = 0;
 			$failed = 0;
 
+			// Skip the header row.
+			$header = fgetcsv($file_handle);
+
+			// Получение данных из базы данных
+			global $wpdb;
+
 			// Loop through each row of the file.
 			while ( ( $row = fgetcsv( $file_handle, 1000, ',' ) ) !== false ) {
-				// Skip the header row.
-				if ( $imported === 0 && $failed === 0 ) {
-					$imported++;
-					continue;
-				}
-
 				// Assign values to variables.
 				$post_id         = (int) $row[0];
 				$post_title      = $row[1];
@@ -37,13 +38,13 @@ class Affiliate_Links_CSV_Importer {
 				$post_excerpt    = $row[4];
 				$post_status     = $row[5];
 				$comment_status  = $row[6];
-				$post_type       = $row[7];
+				$post_type       = 'affiliate-links';
 				$guid            = $row[8];
 
 				// Create a new post or update the existing one.
-				if ( ! $post_id ) {
+				if ( ! $post_id || ( $post_id && ! get_post( $post_id ) ) )  {
 					// Create a new post.
-					$post_id = wp_insert_post( array(
+					$post_data = array(
 						'post_title'    => $post_title,
 						'post_name'     => $post_name,
 						'post_content'  => $post_content,
@@ -52,16 +53,17 @@ class Affiliate_Links_CSV_Importer {
 						'comment_status'=> $comment_status,
 						'post_type'     => $post_type,
 						'guid'          => $guid,
-					) );
+					);
+					$insert_result = wp_insert_post($post_data, true);
 
-					if ( $post_id !== 0 ) {
+					if ( !is_wp_error($insert_result) ) {
 						$imported++;
 					} else {
 						$failed++;
 					}
 				} else {
 					// Update the existing post.
-					$post_id = wp_update_post( array(
+					$post_data = array(
 						'ID'            => $post_id,
 						'post_title'    => $post_title,
 						'post_name'     => $post_name,
@@ -71,9 +73,10 @@ class Affiliate_Links_CSV_Importer {
 						'comment_status'=> $comment_status,
 						'post_type'     => $post_type,
 						'guid'          => $guid,
-					) );
+					);
+					$update_result = wp_update_post($post_data, true);
 
-					if ( $post_id !== 0 ) {
+					if ( !is_wp_error($update_result) ) {
 						$imported++;
 					} else {
 						$failed++;
