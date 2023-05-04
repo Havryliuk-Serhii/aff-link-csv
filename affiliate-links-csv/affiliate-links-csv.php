@@ -26,14 +26,17 @@ if ( is_plugin_active( 'affiliate-links/affiliate-links.php' ) ) {
 	/**
 	 * Activation/deactivation stuff
 	 */
-	register_activation_hook( __FILE__, array(
-		$Affiliate_Links_CSV,
-		'activation_hook',
-	) );
-	register_deactivation_hook( __FILE__, array(
-		$Affiliate_Links_CSV,
-		'deactivation_hook',
-	) );
+	register_activation_hook( __FILE__, 'csv_activate' );
+	register_deactivation_hook( __FILE__, 'csv_deactivate' );
+
+	function csv_activate(){
+		do_action( 'csv_activate' );
+	}
+
+	function csv_deactivate() {
+		remove_action( 'csv_activate', array( 'Affiliate_Links_CSV', 'activate' ) );
+	}
+
 } else {
 	// Display a notice to inform the user that the main Affiliate Links plugin is required for this extension to work.
 	add_action( 'admin_notices', 'affiliate_links_csv_required_notice' );
