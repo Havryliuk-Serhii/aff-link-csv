@@ -20,6 +20,8 @@ class Affiliate_Links_CSV {
 	}
 
 	public function run() {
-		( new Affiliate_Links_CSV_Admin() )->add_hooks();
+		$exporter = new Affiliate_Links_CSV_Exporter();
+		add_action('admin_menu', array($exporter, 'handle_export_action'), 1);
+		(new Affiliate_Links_CSV_Admin())->add_hooks();
 	}
 }
